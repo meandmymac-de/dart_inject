@@ -68,21 +68,54 @@ class InjectionContext {
     initializer(this);
   }
 
+  /// This method shall be called to register a service with the injection
+  /// context. It must only be called, after the [startup] has been called.
+  ///
+  /// The [initializer] is called when an instance of the service shall be
+  /// created. It must return the instance of the service. By passing a [name],
+  /// it is possible to register different services that implement the same
+  /// class. If the flag [asSingleton] is true, the [initializer] is only called
+  /// once when resolving the service. The created service instance will be
+  /// cached. If the flag [asSingleton] is false, the [initializer] is called
+  /// every time when resolving the service.
+  ///
+  /// Throws a [InjectionContextNotInitialized] exception, if the injection
+  /// context is not started.
+  ///
+  /// Throws a [InjectionContextHasAlreadyService] exception, if the service
+  /// that shall be registered was already registered before.
   void register<T>(ServiceInitializer<T> initializer,
       {String name, bool asSingleton = true}) {
     if (!_initialized) {
       throw InjectionContextNotInitialized();
     }
 
+    if (_services.containsKey(_key<T>(name))) {
+      throw InjectionContextHasAlreadyService(
+          T.runtimeType.toString(), name ?? T.runtimeType.toString());
+    }
+
     _services[_key(name)] = _ServiceConfiguration<T>(
         name: name, serviceInitializer: initializer, singleton: asSingleton);
   }
 
+  /// This method resolves a service determined by the type[T] and an optional
+  /// [name].
+  ///
+  /// Throws a [InjectionContextNotInitialized] exception, if the injection
+  /// context is not started.
+  ///
+  /// Throws a [InjectionContextHasNoService] exception, if the service
+  /// that shall be resolved was not registered before.
   T resolve<T>({String name}) {
     if (!_initialized) {
       throw InjectionContextNotInitialized();
     }
 
+    if (!_services.containsKey(_key<T>(name))) {
+      throw InjectionContextHasNoService(
+          T.runtimeType.toString(), name ?? T.runtimeType.toString());
+    }
     var configuration = _services[_key<T>(name)];
 
     if (configuration.singleton) {
@@ -99,9 +132,13 @@ class InjectionContext {
   }
 }
 
+/// This is a convenience method that simply forwards the call to the method
+/// [register] of the class [InjectionContext].
 void register<T>(ServiceInitializer<T> initializer,
         {String name, bool asSingleton = true}) =>
     InjectionContext()
         .register(initializer, name: name, asSingleton: asSingleton);
 
+/// This is a convenience method that simply forwards the call to the method
+/// [resolve] of the class [InjectionContext].
 T resolve<T>({String name}) => InjectionContext().resolve(name: name);
