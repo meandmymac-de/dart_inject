@@ -14,8 +14,13 @@
 // limitations under the License.
 //
 
-/// A very simple and easy to use dependency injection framework for Dart.
-library dart_inject;
+class InjectionContextNotInitialized extends StateError implements Exception {
+  InjectionContextNotInitialized()
+      : super('The InjectionContext is not initialized');
+}
 
-export 'src/exceptions.dart';
-export 'src/injection_context.dart';
+class InjectionContextAlreadyInitialized extends StateError
+    implements Exception {
+  InjectionContextAlreadyInitialized()
+      : super('The InjectionContext is already initialized');
+}

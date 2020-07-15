@@ -18,13 +18,32 @@ import 'package:dart_inject/dart_inject.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Instantiating containers', () {
-    test('The global container is available', () {
-      expect(Container.global, isNotNull);
+  //
+  // ***** Instantiating the injection context *****
+  //
+  group('Instantiating the injection context', () {
+    test('The injection context is available', () {
+      expect(InjectionContext(), isNotNull);
     });
 
-    test('The global container has no parent', () {
-      expect(Container.global.parent, isNull);
+    test('The injection context is always the same', () {
+      expect(InjectionContext(), equals(InjectionContext()));
+    });
+  });
+  //
+  // ***** Check initialization logic *****
+  //
+  group('Check initialization logic', () {
+    test('Registering a service without startup is not only possible', () {
+      expect(
+          () => InjectionContext().register<String>(() => ''), throwsException);
+    });
+
+    test('Starting the injection context more than once is not possible', () {
+      expect(() {
+        InjectionContext().startup((context) {});
+        InjectionContext().startup((context) {});
+      }, throwsException);
     });
   });
 }
