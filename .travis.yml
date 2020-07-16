@@ -9,5 +9,6 @@ dart:
 #- test: --platform vm
 #  xvfb: false
 script: 
-  pub run test_coverage --min-coverage=90
-  dartanalyzer --fatal-infos lib
+  - pub run test
+  - pub run test_coverage --min-coverage=90
+  - dartanalyzer --fatal-infos lib
