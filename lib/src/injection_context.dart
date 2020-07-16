@@ -48,7 +48,7 @@ class InjectionContext {
   Map<String, _ServiceConfiguration> _services = {};
 
   /// Internal constructor for the singleton.
-  InjectionContext._global();
+  InjectionContext._global() {}
 
   /// This factory always returns the singleton instance of the
   /// [InjectionContext].
