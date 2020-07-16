@@ -7,4 +7,5 @@ dart:
 # Install the latest dev release
 - dev
 dart_task:
+- analyze: --fatal-infos
 - test: --platform vm

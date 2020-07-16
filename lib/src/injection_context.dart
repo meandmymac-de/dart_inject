@@ -48,7 +48,7 @@ class InjectionContext {
   Map<String, _ServiceConfiguration> _services = {};
 
   /// Internal constructor for the singleton.
-  InjectionContext._global() {}
+  InjectionContext._global();
 
   /// This factory always returns the singleton instance of the
   /// [InjectionContext].
@@ -91,19 +91,17 @@ class InjectionContext {
   ///
   /// Throws a [InjectionContextHasAlreadyService] exception, if the service
   /// that shall be registered was already registered before.
-  void register<T>(ServiceInitializer<T> initializer,
-      {String name, bool asSingleton = true}) {
+  void register<T>(ServiceInitializer<T> initializer, {String name, bool asSingleton = true}) {
     if (!_initialized) {
       throw InjectionContextNotInitialized();
     }
 
     if (_services.containsKey(_key<T>(name))) {
-      throw InjectionContextHasAlreadyService(
-          T.runtimeType.toString(), name ?? T.runtimeType.toString());
+      throw InjectionContextHasAlreadyService(T.runtimeType.toString(), name ?? T.runtimeType.toString());
     }
 
-    _services[_key(name)] = _ServiceConfiguration<T>(
-        name: name, serviceInitializer: initializer, singleton: asSingleton);
+    _services[_key(name)] =
+        _ServiceConfiguration<T>(name: name, serviceInitializer: initializer, singleton: asSingleton);
   }
 
   /// This method resolves a service determined by the type[T] and an optional
@@ -120,8 +118,7 @@ class InjectionContext {
     }
 
     if (!_services.containsKey(_key<T>(name))) {
-      throw InjectionContextHasNoService(
-          T.runtimeType.toString(), name ?? T.runtimeType.toString());
+      throw InjectionContextHasNoService(T.runtimeType.toString(), name ?? T.runtimeType.toString());
     }
     var configuration = _services[_key<T>(name)];
 
@@ -135,16 +132,14 @@ class InjectionContext {
   }
 
   String _key<T>(String name) {
-    return T.runtimeType.toString() + ":" + (name ?? T.runtimeType.toString());
+    return T.runtimeType.toString() + ':' + (name ?? T.runtimeType.toString());
   }
 }
 
 /// This is a convenience method that simply forwards the call to the method
 /// [register] of the class [InjectionContext].
-void register<T>(ServiceInitializer<T> initializer,
-        {String name, bool asSingleton = true}) =>
-    InjectionContext()
-        .register(initializer, name: name, asSingleton: asSingleton);
+void register<T>(ServiceInitializer<T> initializer, {String name, bool asSingleton = true}) =>
+    InjectionContext().register(initializer, name: name, asSingleton: asSingleton);
 
 /// This is a convenience method that simply forwards the call to the method
 /// [resolve] of the class [InjectionContext].

@@ -20,7 +20,7 @@ void main() {
     register<Vehicle>(() => Car('BMW X6'));
   });
 
-  var car = resolve<Vehicle>();
+  var car = resolve<Vehicle>(); 
   var carName = car.name;
   print('I own a $carName');
 }
