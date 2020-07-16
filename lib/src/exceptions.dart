@@ -15,18 +15,14 @@
 //
 
 class InjectionContextNotInitialized extends StateError implements Exception {
-  InjectionContextNotInitialized()
-      : super('The InjectionContext is not initialized');
+  InjectionContextNotInitialized() : super('The InjectionContext is not initialized');
 }
 
-class InjectionContextAlreadyInitialized extends StateError
-    implements Exception {
-  InjectionContextAlreadyInitialized()
-      : super('The InjectionContext is already initialized');
+class InjectionContextAlreadyInitialized extends StateError implements Exception {
+  InjectionContextAlreadyInitialized() : super('The InjectionContext is already initialized');
 }
 
-class InjectionContextHasAlreadyService extends StateError
-    implements Exception {
+class InjectionContextHasAlreadyService extends StateError implements Exception {
   InjectionContextHasAlreadyService(String service, String name)
       : super('The InjectionContext has no registered service $service:$name');
 }

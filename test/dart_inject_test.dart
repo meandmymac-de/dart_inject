@@ -36,8 +36,7 @@ void main() {
   //
   group('Check initialization logic', () {
     test('Registering a service without startup is not only possible', () {
-      expect(
-          () => InjectionContext().register<String>(() => ''), throwsException);
+      expect(() => InjectionContext().register<String>(() => ''), throwsException);
     });
 
     test('Starting the injection context more than once is not possible', () {
@@ -59,8 +58,7 @@ void main() {
 
       expect(() => resolve<String>(), throwsException);
     });
-    test('Register a non-singleton service and resolving it, is successful',
-        () {
+    test('Register a non-singleton service and resolving it, is successful', () {
       InjectionContext().startup((context) {
         register<String>(() => 'Hello world!', asSingleton: false);
       });
@@ -69,8 +67,7 @@ void main() {
 
       expect(service, equals('Hello world!'));
     });
-    test('Register a non-singleton service creates new instances on resolution',
-        () {
+    test('Register a non-singleton service creates new instances on resolution', () {
       var instNum = 0;
       InjectionContext().startup((context) {
         register<String>(() {
@@ -86,9 +83,7 @@ void main() {
       expect(service2, equals("I'm instance 2"));
       expect(identical(service1, service2), isFalse);
     });
-    test(
-        'Register a singleton service returns the same instances on resolution',
-        () {
+    test('Register a singleton service returns the same instances on resolution', () {
       var instNum = 0;
       InjectionContext().startup((context) {
         register<String>(() {
@@ -104,9 +99,7 @@ void main() {
       expect(service2, equals("I'm instance 1"));
       expect(identical(service1, service2), isTrue);
     });
-    test(
-        'Registering services with same type and different names and resolving them is successful',
-        () {
+    test('Registering services with same type and different names and resolving them is successful', () {
       InjectionContext().startup((context) {
         register<String>(() => "I'm a Cat", name: 'Cat', asSingleton: false);
         register<String>(() => "I'm a Dog", name: 'Dog', asSingleton: false);
@@ -118,14 +111,11 @@ void main() {
       expect(cat, equals("I'm a Cat"));
       expect(dog, equals("I'm a Dog"));
     });
-    test('Registering two services with same type and names is not successful',
-        () {
+    test('Registering two services with same type and names is not successful', () {
       expect(
           () => InjectionContext().startup((context) {
-                register<String>(() => "I'm a Cat",
-                    name: 'Pet', asSingleton: false);
-                register<String>(() => "I'm a Dog",
-                    name: 'Pet', asSingleton: false);
+                register<String>(() => "I'm a Cat", name: 'Pet', asSingleton: false);
+                register<String>(() => "I'm a Dog", name: 'Pet', asSingleton: false);
               }),
           throwsException);
     });
