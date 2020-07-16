@@ -8,3 +8,9 @@ script:
   - pub run test
   - pub run test_coverage --min-coverage=90
   - dartanalyzer --fatal-infos lib
+
+deploy:
+    provider: script
+    script: pub publish -f
+    on:
+      branch: master
