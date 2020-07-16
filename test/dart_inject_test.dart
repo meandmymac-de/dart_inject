@@ -46,11 +46,19 @@ void main() {
         InjectionContext().startup((context) {});
       }, throwsException);
     });
+    test('Resolving without an initialized injection context is failing', () {
+      expect(() => resolve<String>(), throwsException);
+    });
   });
   //
   // ***** Registering an resolving services is successful *****
   //
-  group('Registering an resolving services is successful', () {
+  group('Registering and resolving services is successful', () {
+    test('Resolving an unknown service is failing', () {
+      InjectionContext().startup((context) {});
+
+      expect(() => resolve<String>(), throwsException);
+    });
     test('Register a non-singleton service and resolving it, is successful',
         () {
       InjectionContext().startup((context) {
