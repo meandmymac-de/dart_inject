@@ -96,5 +96,30 @@ void main() {
       expect(service2, equals("I'm instance 1"));
       expect(identical(service1, service2), isTrue);
     });
+    test(
+        'Registering services with same type and different names and resolving them is successful',
+        () {
+      InjectionContext().startup((context) {
+        register<String>(() => "I'm a Cat", name: 'Cat', asSingleton: false);
+        register<String>(() => "I'm a Dog", name: 'Dog', asSingleton: false);
+      });
+
+      var cat = resolve<String>(name: 'Cat');
+      var dog = resolve<String>(name: 'Dog');
+
+      expect(cat, equals("I'm a Cat"));
+      expect(dog, equals("I'm a Dog"));
+    });
+    test('Registering two services with same type and names is not successful',
+        () {
+      expect(
+          () => InjectionContext().startup((context) {
+                register<String>(() => "I'm a Cat",
+                    name: 'Pet', asSingleton: false);
+                register<String>(() => "I'm a Dog",
+                    name: 'Pet', asSingleton: false);
+              }),
+          throwsException);
+    });
   });
 }
