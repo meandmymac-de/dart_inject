@@ -4,8 +4,6 @@ dart:
 - stable
 # Install the latest beta release
 - beta
-# Install the latest dev release
-- dev
 dart_task:
-- analyze: --fatal-infos
+- dartanalyzer: --fatal-infos
 - test: --platform vm
