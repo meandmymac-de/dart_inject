@@ -4,8 +4,10 @@ dart:
 - stable
 # Install the latest beta release
 - beta
-dart_task:
-- dartanalyzer: --fatal-infos lib
+#dart_task:
+#- dartanalyzer: --fatal-infos lib
 #- test: --platform vm
 #  xvfb: false
-#script: pub run test_coverage --min-coverage=110
+script: 
+  pub run test_coverage --min-coverage=90
+  dartanalyzer --fatal-infos lib
