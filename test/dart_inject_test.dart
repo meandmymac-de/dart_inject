@@ -18,6 +18,7 @@ import 'package:dart_inject/dart_inject.dart';
 import 'package:test/test.dart';
 
 void main() {
+  tearDown(() => InjectionContext().shutDown());
   //
   // ***** Instantiating the injection context *****
   //
@@ -44,6 +45,56 @@ void main() {
         InjectionContext().startup((context) {});
         InjectionContext().startup((context) {});
       }, throwsException);
+    });
+  });
+  //
+  // ***** Registering an resolving services is successful *****
+  //
+  group('Registering an resolving services is successful', () {
+    test('Register a non-singleton service and resolving it, is successful',
+        () {
+      InjectionContext().startup((context) {
+        register<String>(() => 'Hello world!', asSingleton: false);
+      });
+
+      var service = resolve<String>();
+
+      expect(service, equals('Hello world!'));
+    });
+    test('Register a non-singleton service creates new instances on resolution',
+        () {
+      var instNum = 0;
+      InjectionContext().startup((context) {
+        register<String>(() {
+          instNum++;
+          return "I'm instance $instNum";
+        }, asSingleton: false);
+      });
+
+      var service1 = resolve<String>();
+      var service2 = resolve<String>();
+
+      expect(service1, equals("I'm instance 1"));
+      expect(service2, equals("I'm instance 2"));
+      expect(identical(service1, service2), isFalse);
+    });
+    test(
+        'Register a singleton service returns the same instances on resolution',
+        () {
+      var instNum = 0;
+      InjectionContext().startup((context) {
+        register<String>(() {
+          instNum++;
+          return "I'm instance $instNum";
+        }, asSingleton: true);
+      });
+
+      var service1 = resolve<String>();
+      var service2 = resolve<String>();
+
+      expect(service1, equals("I'm instance 1"));
+      expect(service2, equals("I'm instance 1"));
+      expect(identical(service1, service2), isTrue);
     });
   });
 }

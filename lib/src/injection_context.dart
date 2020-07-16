@@ -68,6 +68,13 @@ class InjectionContext {
     initializer(this);
   }
 
+  /// This method can be called to reset the injection context. Every registered
+  /// service and all singleton instances will be removed.
+  void shutDown() {
+    _initialized = false;
+    _services = {};
+  }
+
   /// This method shall be called to register a service with the injection
   /// context. It must only be called, after the [startup] has been called.
   ///
