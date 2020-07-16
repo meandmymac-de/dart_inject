@@ -1,4 +1,4 @@
-# dart_inject
+# dart_inject ![Build Result](https://travis-ci.org/meandmymac-de/dart_inject.svg?branch=master)
 
 A very simple and easy to use dependency injection framework for Dart.
 
