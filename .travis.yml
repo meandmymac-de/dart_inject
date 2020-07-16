@@ -8,3 +8,4 @@ dart_task:
 - dartanalyzer: --fatal-infos lib
 - test: --platform vm
   xvfb: false
+- script: pub run test_coverage --min-coverage=110
