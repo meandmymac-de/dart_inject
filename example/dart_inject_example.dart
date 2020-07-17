@@ -16,7 +16,7 @@ class Car implements Vehicle {
 }
 
 void main() {
-  di.startup((context) {
+  di.startup(() {
     di.register<Vehicle>(() => Car('BMW X6'));
   });
 

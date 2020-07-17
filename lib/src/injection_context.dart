@@ -24,8 +24,8 @@ String _typeOf<T>() => reflectClass(T).reflectedType.toString();
 typedef ServiceInitializer<T> = T Function();
 
 /// This the function type definition for the initialization of the available
-/// services. The function is called with the [context].
-typedef InjectionInitializer = void Function(_InjectionContext context);
+/// services.
+typedef InjectionInitializer = void Function();
 
 class _ServiceConfiguration<T> {
   String name;
@@ -68,7 +68,7 @@ class _InjectionContext {
 
     _initialized = true;
 
-    initializer(this);
+    initializer();
   }
 
   /// This method can be called to reset the injection context. Every registered

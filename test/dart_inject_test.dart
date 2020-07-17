@@ -14,8 +14,6 @@
 // limitations under the License.
 //
 
-import 'dart:mirrors';
-
 import 'package:dart_inject/dart_inject.dart' as di;
 import 'package:test/test.dart';
 
@@ -31,8 +29,8 @@ void main() {
 
     test('Starting the injection context more than once is not possible', () {
       expect(() {
-        di.startup((context) {});
-        di.startup((context) {});
+        di.startup(() {});
+        di.startup(() {});
       }, throwsException);
     });
     test('Resolving without an initialized injection context is failing', () {
@@ -44,12 +42,12 @@ void main() {
   //
   group('Registering and resolving services is successful', () {
     test('Resolving an unknown service is failing', () {
-      di.startup((context) {});
+      di.startup(() {});
 
       expect(() => di.resolve<String>(), throwsException);
     });
     test('Register a non-singleton service and resolving it, is successful', () {
-      di.startup((context) {
+      di.startup(() {
         di.register<String>(() => 'Hello world!', asSingleton: false);
       });
 
@@ -59,7 +57,7 @@ void main() {
     });
     test('Register a non-singleton service creates new instances on resolution', () {
       var instNum = 0;
-      di.startup((context) {
+      di.startup(() {
         di.register<String>(() {
           instNum++;
           return "I'm instance $instNum";
@@ -75,7 +73,7 @@ void main() {
     });
     test('Register a singleton service returns the same instances on resolution', () {
       var instNum = 0;
-      di.startup((context) {
+      di.startup(() {
         di.register<String>(() {
           instNum++;
           return "I'm instance $instNum";
@@ -90,7 +88,7 @@ void main() {
       expect(identical(service1, service2), isTrue);
     });
     test('Registering services with same type and different names and resolving them is successful', () {
-      di.startup((context) {
+      di.startup(() {
         di.register<String>(() => "I'm a Cat", name: 'Cat', asSingleton: false);
         di.register<String>(() => "I'm a Dog", name: 'Dog', asSingleton: false);
       });
@@ -103,14 +101,14 @@ void main() {
     });
     test('Registering two services with same type and names is not successful', () {
       expect(
-          () => di.startup((context) {
+          () => di.startup(() {
                 di.register<String>(() => "I'm a Cat", name: 'Pet', asSingleton: false);
                 di.register<String>(() => "I'm a Dog", name: 'Pet', asSingleton: false);
               }),
           throwsException);
     });
     test('Resolving all services that implement a class is successful', () {
-      di.startup((context) {
+      di.startup(() {
         di.register<String>(() => 'Service 1', name: 'srv1');
         di.register<String>(() => 'Service 2', name: 'srv2');
         di.register<String>(() => 'Service 3', name: 'srv3');
