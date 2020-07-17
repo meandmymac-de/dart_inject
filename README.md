@@ -7,7 +7,7 @@ A very simple and easy to use dependency injection framework for Dart.
 A simple usage example:
 
 ```dart
-import 'package:dart_inject/dart_inject.dart';
+import 'package:dart_inject/dart_inject.dart' as di;
 
 abstract class Vehicle {
   String get name;
@@ -25,15 +25,14 @@ class Car implements Vehicle {
 }
 
 void main() {
-  InjectionContext().startup((context) {
-    register<Vehicle>(() => Car('BMW X6'));
+  di.startup((context) {
+    di.register<Vehicle>(() => Car('BMW X6'));
   });
 
-  var car = resolve<Vehicle>();
+  var car = di.resolve<Vehicle>();
   var carName = car.name;
   print('I own a $carName');
 }
-
 ```
 
 ## Features and bugs
