@@ -1,6 +1,6 @@
 name: dart_inject
 description: A very simple and easy to use dependency injection framework for Dart.
-version: 0.1.0
+version: 0.2.0
 homepage: https://github.com/meandmymac-de/dart_inject
 issue_tracker: https://github.com/meandmymac-de/dart_inject/issues
 
