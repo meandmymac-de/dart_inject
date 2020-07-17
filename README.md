@@ -25,7 +25,7 @@ class Car implements Vehicle {
 }
 
 void main() {
-  di.startup((context) {
+  di.startup(() {
     di.register<Vehicle>(() => Car('BMW X6'));
   });
 
@@ -33,6 +33,7 @@ void main() {
   var carName = car.name;
   print('I own a $carName');
 }
+
 ```
 
 ## Features and bugs

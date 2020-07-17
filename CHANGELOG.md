@@ -1,3 +1,6 @@
+## 0.2.2
+- dart_inject is now compatible with flutter.
+
 ## 0.2.1
 - Removed the injection context from all public functions and function type definitions.
 

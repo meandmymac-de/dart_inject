@@ -13,11 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-import 'dart:mirrors';
 
 import 'exceptions.dart';
 
-String _typeOf<T>() => reflectClass(T).reflectedType.toString();
+String _typeOf<T>() => T.toString();
 
 /// This function type defines the signature for functions that initialize a
 /// service instances.
