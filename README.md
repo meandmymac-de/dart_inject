@@ -1,4 +1,4 @@
-# dart_inject
+# dart_inject ![Build](https://gitlab.com/thbonk/dart_inject/badges/master/pipeline.svg)
 
 A very simple and easy to use dependency injection framework for Dart.
 
