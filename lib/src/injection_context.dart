@@ -135,15 +135,11 @@ class _InjectionContext {
       throw InjectionContextNotInitialized();
     }
 
-    var services = <T>[];
-
-    _services.keys.toList().forEach((key) {
-      if (key.startsWith(_typeOf<T>() + ':')) {
-        services.add(_instanceForConfiguration(_services[key]));
-      }
-    });
-
-    return services;
+    return _services.keys
+        .toList()
+        .where((key) => key.startsWith(_typeOf<T>() + ':'))
+        .map<T>((key) => _instanceForConfiguration<T>(_services[key]))
+        .toList();
   }
 
   dynamic _instanceForConfiguration<T>(_ServiceConfiguration<T> configuration) {
