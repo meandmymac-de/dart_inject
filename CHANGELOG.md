@@ -1,3 +1,6 @@
+## 0.2.3
+- Some code optimiziation.
+
 ## 0.2.2
 - dart_inject is now compatible with flutter.
 
