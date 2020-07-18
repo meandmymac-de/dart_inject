@@ -31,13 +31,13 @@ test:
   tags:
     - docker
 
-dry-run:
-  stage: publish
-  script:
-    - pub get
-    - pub publish --dry-run
-  only:
-    - master
+#dry-run:
+#  stage: publish
+#  script:
+#    - pub get
+#    - pub publish --dry-run
+#  only:
+#    - master
 
 pub-dev:
   stage: publish
@@ -72,31 +72,31 @@ pub-dev:
         "expiration":${PUB_DEV_PUBLISH_EXPIRATION}
       }
       EOF
-    - flutter pub get
-    - flutter pub publish -f
+    - pub get
+    - pub publish -f
   only:
     - master
 
-tag:
-  image: docker:stable
-  services:
-    - docker:stable-dind
-  stage: publish
-  script:
-    - |
-      if [ -z "${GITLAB_API_TOKEN}" ]; then
-        echo "Missing GITLAB_API_TOKEN environment variable"
-        exit 1
-      fi
-
-      export TAG_NAME="$(awk '/^version: /{print $NF}' pubspec.yaml)"
-      docker run --rm curlimages/curl --fail --request POST --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
-        --data-urlencode "tag_name=v${TAG_NAME}" \
-        --data-urlencode "ref=master" \
-        --data-urlencode "release_description=Check the [CHANGELOG.md](/CHANGELOG.md)" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/tags"
-  environment:
-    name: pub-dev
-    url: https://pub.dev/packages/dart_inject
-  only:
-    - master
+#tag:
+#  image: docker:stable
+#  services:
+#    - docker:stable-dind
+#  stage: publish
+#  script:
+#    - |
+#      if [ -z "${GITLAB_API_TOKEN}" ]; then
+#        echo "Missing GITLAB_API_TOKEN environment variable"
+#        exit 1
+#      fi
+#
+#      export TAG_NAME="$(awk '/^version: /{print $NF}' pubspec.yaml)"
+#      docker run --rm curlimages/curl --fail --request POST --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+#        --data-urlencode "tag_name=v${TAG_NAME}" \
+#        --data-urlencode "ref=master" \
+#        --data-urlencode "release_description=Check the [CHANGELOG.md](/CHANGELOG.md)" \
+#        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/tags"
+#  environment:
+#    name: pub-dev
+#    url: https://pub.dev/packages/dart_inject
+#  only:
+#    - master
