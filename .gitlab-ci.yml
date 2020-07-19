@@ -63,7 +63,6 @@ pub-dev:
         exit 1
       fi
 
-#      cat <<EOF > ~/.pub-cache/credentials.json
       cat <<EOF > /var/cache/pub/credentials.json
       {
         "accessToken":"$(echo "${PUB_DEV_PUBLISH_ACCESS_TOKEN}" | base64 -d)",
@@ -78,6 +77,7 @@ pub-dev:
   only:
     - master
 
+#      cat <<EOF > ~/.pub-cache/credentials.json
 #tag:
 #  image: docker:stable
 #  services:
