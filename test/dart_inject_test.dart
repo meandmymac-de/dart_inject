@@ -18,7 +18,7 @@ import 'package:dart_inject/dart_inject.dart' as di;
 import 'package:test/test.dart';
 
 void main() {
-  tearDown(() => di.shutDown());
+  tearDown(() => di.shutdown());
   //
   // ***** Check initialization logic *****
   //

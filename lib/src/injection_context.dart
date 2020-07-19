@@ -72,7 +72,7 @@ class _InjectionContext {
 
   /// This method can be called to reset the injection context. Every registered
   /// service and all singleton instances will be removed.
-  void shutDown() {
+  void shutdown() {
     _initialized = false;
     _services = {};
   }
@@ -83,7 +83,7 @@ class _InjectionContext {
   /// The [initializer] is called when an instance of the service shall be
   /// created. It must return the instance of the service. By passing a [name],
   /// it is possible to register different services that implement the same
-  /// class. If the flag [asSingleton] is true, the [initializer] is only called
+  /// class. If the flag [asSingleton] is true, the [globalInitializer] is only called
   /// once when resolving the service. The created service instance will be
   /// cached. If the flag [asSingleton] is false, the [initializer] is called
   /// every time when resolving the service.
@@ -93,7 +93,11 @@ class _InjectionContext {
   ///
   /// Throws a [InjectionContextHasAlreadyService] exception, if the service
   /// that shall be registered was already registered before.
-  void register<T>(ServiceInitializer<T> initializer, {String name, bool asSingleton = true}) {
+  void register<T>(
+    ServiceInitializer<T> globalInitializer, {
+    String name,
+    bool asSingleton = true,
+  }) {
     if (!_initialized) {
       throw InjectionContextNotInitialized();
     }
@@ -103,7 +107,7 @@ class _InjectionContext {
     }
 
     _services[_key<T>(name)] =
-        _ServiceConfiguration<T>(name: name, serviceInitializer: initializer, singleton: asSingleton);
+        _ServiceConfiguration<T>(name: name, serviceInitializer: globalInitializer, singleton: asSingleton);
   }
 
   /// This method resolves a service determined by the type [T] and an optional
@@ -163,7 +167,7 @@ void startup(InjectionInitializer initializer) => _InjectionContext().startup(in
 
 /// This function can be called to reset the injection context. Every registered
 /// service and all singleton instances will be removed.
-void shutDown() => _InjectionContext().shutDown();
+void shutdown() => _InjectionContext().shutdown();
 
 /// This function shall be called to register a service with the injection
 /// context. It must only be called, after the [startup] has been called.
