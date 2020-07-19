@@ -35,12 +35,61 @@ class _ServiceConfiguration<T> {
   _ServiceConfiguration({this.name, this.serviceInitializer, this.singleton});
 }
 
+/// This singleton class holds all context for the different profiles.
+class _ContextCollection {
+  /// Name of the global profiles.
+  static final String globalProfile = '_____GLOBAL_____';
+
+  /// The singleton instance.
+  static final _ContextCollection _singleton = _ContextCollection._global();
+
+  /// Maps with all assignments from profile name to its injection context.
+  Map<String, _InjectionContext> profiles = {
+    _ContextCollection.globalProfile: _InjectionContext(profile: _ContextCollection.globalProfile)
+  };
+
+  /// All active profiles
+  List<String> activeProfiles = [];
+
+  /// Internal constructor for the singleton.
+  _ContextCollection._global();
+
+  /// Getter for the shared instance.
+  static _ContextCollection get shared => _ContextCollection._singleton;
+
+  _InjectionContext get globalContext {
+    return _getContext(globalProfile);
+  }
+
+  _InjectionContext _getContext(String profile) {
+    var context;
+
+    if (profiles.containsKey(profile)) {
+      context = profiles[profile];
+    } else {
+      context = _InjectionContext(profile: profile);
+      profiles[profile] = context;
+    }
+
+    return context;
+  }
+
+  void startupContext(String profile, InjectionInitializer initializer) {
+    _getContext(profile).startup(initializer);
+  }
+
+  void shutdown() {
+    profiles.values.forEach((context) => context.shutdown());
+    profiles = {};
+    activeProfiles = [];
+  }
+}
+
 /// The [_InjectionContext] is the global registry for all services. It is a
 /// singleton, since the context must be the same instance in the entire
 /// application.
 class _InjectionContext {
-  /// The singleton instance of the [_InjectionContext].
-  static final _InjectionContext _singleton = _InjectionContext._global();
+  String profile;
 
   /// This flag determines whether the [startup] method has been called or not.
   /// If the [startup] method has not been calledm the [_InjectionContext] is not
@@ -49,14 +98,9 @@ class _InjectionContext {
 
   Map<String, _ServiceConfiguration> _services = {};
 
-  /// Internal constructor for the singleton.
-  _InjectionContext._global();
-
   /// This factory always returns the singleton instance of the
   /// [_InjectionContext].
-  factory _InjectionContext() {
-    return _singleton;
-  }
+  _InjectionContext({this.profile});
 
   /// This method must be called at the very beginning of the application.
   /// It calls the [InjectionInitializer] to initialize itself.
@@ -162,12 +206,30 @@ class _InjectionContext {
 }
 
 /// This function must be called at the very beginning of the application to initialize
-/// the injection context.
-void startup(InjectionInitializer initializer) => _InjectionContext().startup(initializer);
+/// the injection context. The [initializer] is the one for the gloabl profile. The
+/// [activeProfiles] is a list of all the profile names that are currently activated.
+/// When resolving a service, the global profile and the all the activated profiles are
+/// used to search a service, where the global propfile has the least priority.
+/// The map [profileInitializers] are the initializers for the differemt know profiles.
+void startup(InjectionInitializer initializer,
+    {List<String> activeProfiles, Map<String, InjectionInitializer> profileInitializers}) {
+  _ContextCollection.shared.activeProfiles.addAll(activeProfiles ?? []);
+
+  var globalContext = _ContextCollection.shared.globalContext;
+  globalContext.startup(initializer);
+
+  if (profileInitializers != null) {
+    profileInitializers.keys.toList().forEach((profile) {
+      _ContextCollection.shared.startupContext(profile, profileInitializers[profile]);
+    });
+  }
+}
 
 /// This function can be called to reset the injection context. Every registered
 /// service and all singleton instances will be removed.
-void shutdown() => _InjectionContext().shutdown();
+void shutdown() {
+  _ContextCollection.shared.shutdown();
+}
 
 /// This function shall be called to register a service with the injection
 /// context. It must only be called, after the [startup] has been called.
@@ -175,7 +237,12 @@ void shutdown() => _InjectionContext().shutdown();
 /// The [initializer] is called when an instance of the service shall be
 /// created. It must return the instance of the service. By passing a [name],
 /// it is possible to register different services that implement the same
-/// class. If the flag [asSingleton] is true, the [initializer] is only called
+/// class.
+///
+/// If the [profile] is given, the service is registered only for the given
+/// profile.
+///
+/// If the flag [asSingleton] is true, the [initializer] is only called
 /// once when resolving the service. The created service instance will be
 /// cached. If the flag [asSingleton] is false, the [initializer] is called
 /// every time when resolving the service.
@@ -185,8 +252,12 @@ void shutdown() => _InjectionContext().shutdown();
 ///
 /// Throws a [InjectionContextHasAlreadyService] exception, if the service
 /// that shall be registered was already registered before.
-void register<T>(ServiceInitializer<T> initializer, {String name, bool asSingleton = true}) =>
-    _InjectionContext().register<T>(initializer, name: name, asSingleton: asSingleton);
+void register<T>(ServiceInitializer<T> initializer, {String name, String profile, bool asSingleton = true}) {
+  var context =
+      profile == null ? _ContextCollection.shared.globalContext : _ContextCollection.shared._getContext(profile);
+
+  context.register(initializer, name: name, asSingleton: asSingleton);
+}
 
 /// This function resolves a service determined by the type [T] and an optional
 /// [name].
@@ -196,10 +267,12 @@ void register<T>(ServiceInitializer<T> initializer, {String name, bool asSinglet
 ///
 /// Throws a [InjectionContextHasNoService] exception, if the service
 /// that shall be resolved was not registered before.
-T resolve<T>({String name}) => _InjectionContext().resolve<T>(name: name);
+T resolve<T>({String name}) => _ContextCollection.shared.globalContext.resolve<T>(name: name);
+
+//=> _InjectionContext().resolve<T>(name: name);
 
 /// This function resolves a service determined by the type [T].
 ///
 /// Throws a [InjectionContextNotInitialized] exception, if the injection
 /// context is not started.
-List<T> resolveAll<T>() => _InjectionContext().resolveAll<T>();
+List<T> resolveAll<T>() => _ContextCollection.shared.globalContext.resolveAll<T>();
