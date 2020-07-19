@@ -42,7 +42,7 @@ test:
 pub-dev:
   stage: publish
   script:
-    - pwd
+    - who
     # - |
     #   if [ -z "${PUB_DEV_PUBLISH_ACCESS_TOKEN}" ]; then
     #     echo "Missing PUB_DEV_PUBLISH_ACCESS_TOKEN environment variable"
