@@ -72,8 +72,9 @@ pub-dev:
         "expiration":${PUB_DEV_PUBLISH_EXPIRATION}
       }
       EOF
-    - pub get
-    - pub publish -f
+    - less ~/.pub-cache/credentials.json
+    #- pub get
+    #- pub publish -f
   only:
     - master
 
