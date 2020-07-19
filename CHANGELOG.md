@@ -1,3 +1,6 @@
+## 1.0.0
+- It is now possible to define profiles. If a service is assigned to a profile, it only gets resolved, if the profile to which it is assigned, is active.
+
 ## 0.2.4
 - Some code cleanup.
 
