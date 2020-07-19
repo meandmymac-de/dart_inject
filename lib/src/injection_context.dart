@@ -16,7 +16,7 @@
 
 import 'exceptions.dart';
 
-String _typeOf<T>() => T.toString();
+String _stringOfType<T>() => T.toString();
 
 /// This function type defines the signature for functions that initialize a
 /// service instances.
@@ -99,7 +99,7 @@ class _InjectionContext {
     }
 
     if (_services.containsKey(_key<T>(name))) {
-      throw InjectionContextHasAlreadyService(_typeOf<T>(), (name ?? _typeOf<T>()));
+      throw InjectionContextHasAlreadyService(_stringOfType<T>(), (name ?? _stringOfType<T>()));
     }
 
     _services[_key<T>(name)] =
@@ -120,7 +120,7 @@ class _InjectionContext {
     }
 
     if (!_services.containsKey(_key<T>(name))) {
-      throw InjectionContextHasNoService(_typeOf<T>(), (name ?? _typeOf<T>()));
+      throw InjectionContextHasNoService(_stringOfType<T>(), (name ?? _stringOfType<T>()));
     }
 
     return _instanceForConfiguration(_services[_key<T>(name)]);
@@ -137,7 +137,7 @@ class _InjectionContext {
 
     return _services.keys
         .toList()
-        .where((key) => key.startsWith(_typeOf<T>() + ':'))
+        .where((key) => key.startsWith(_stringOfType<T>() + ':'))
         .map<T>((key) => _instanceForConfiguration<T>(_services[key]))
         .toList();
   }
@@ -153,7 +153,7 @@ class _InjectionContext {
   }
 
   String _key<T>(String name) {
-    return _typeOf<T>() + ':' + (name ?? _typeOf<T>());
+    return _stringOfType<T>() + ':' + (name ?? _stringOfType<T>());
   }
 }
 

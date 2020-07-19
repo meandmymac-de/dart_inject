@@ -1,3 +1,6 @@
+## 0.2.4
+- Some code cleanup.
+
 ## 0.2.3
 - Some code optimiziation.
 
