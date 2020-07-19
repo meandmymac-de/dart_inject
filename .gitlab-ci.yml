@@ -76,9 +76,8 @@ pub-dev:
         "expiration":${PUB_DEV_PUBLISH_EXPIRATION}
       }
       EOF
-    - ls -al ~
-    # - pub get
-    # - pub publish -f
+    - pub get
+    - pub publish -f
   only:
     - master
 
