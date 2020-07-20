@@ -46,7 +46,8 @@ void main() {
 
       expect(() => di.resolve<String>(), throwsException);
     });
-    test('Register a non-singleton service and resolving it, is successful', () {
+    test('Register a non-singleton service and resolving it, is successful',
+        () {
       di.startup(() {
         di.register<String>(() => 'Hello world!', asSingleton: false);
       });
@@ -55,7 +56,8 @@ void main() {
 
       expect(service, equals('Hello world!'));
     });
-    test('Register a non-singleton service creates new instances on resolution', () {
+    test('Register a non-singleton service creates new instances on resolution',
+        () {
       var instNum = 0;
       di.startup(() {
         di.register<String>(() {
@@ -71,7 +73,9 @@ void main() {
       expect(service2, equals("I'm instance 2"));
       expect(identical(service1, service2), isFalse);
     });
-    test('Register a singleton service returns the same instances on resolution', () {
+    test(
+        'Register a singleton service returns the same instances on resolution',
+        () {
       var instNum = 0;
       di.startup(() {
         di.register<String>(() {
@@ -87,7 +91,9 @@ void main() {
       expect(service2, equals("I'm instance 1"));
       expect(identical(service1, service2), isTrue);
     });
-    test('Registering services with same type and different names and resolving them is successful', () {
+    test(
+        'Registering services with same type and different names and resolving them is successful',
+        () {
       di.startup(() {
         di.register<String>(() => "I'm a Cat", name: 'Cat', asSingleton: false);
         di.register<String>(() => "I'm a Dog", name: 'Dog', asSingleton: false);
@@ -99,11 +105,14 @@ void main() {
       expect(cat, equals("I'm a Cat"));
       expect(dog, equals("I'm a Dog"));
     });
-    test('Registering two services with same type and names is not successful', () {
+    test('Registering two services with same type and names is not successful',
+        () {
       expect(
           () => di.startup(() {
-                di.register<String>(() => "I'm a Cat", name: 'Pet', asSingleton: false);
-                di.register<String>(() => "I'm a Dog", name: 'Pet', asSingleton: false);
+                di.register<String>(() => "I'm a Cat",
+                    name: 'Pet', asSingleton: false);
+                di.register<String>(() => "I'm a Dog",
+                    name: 'Pet', asSingleton: false);
               }),
           throwsException);
     });
@@ -122,4 +131,8 @@ void main() {
       expect(services.contains('Service 3'), isTrue);
     });
   });
+  //
+  // ***** Registering and resolving services for profiles is successful *****
+  //
+  group('Registering and resolving services for profiles is successful', () {});
 }
