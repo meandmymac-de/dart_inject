@@ -24,7 +24,7 @@ typedef ServiceInitializer<T> = T Function();
 
 /// This the function type definition for the initialization of the available
 /// services.
-typedef InjectionInitializer = void Function();
+typedef InjectionInitializer = void Function(Context);
 
 class _ServiceConfiguration<T> {
   String name;
@@ -85,10 +85,36 @@ class _ContextCollection {
   }
 }
 
+/// This abstract class is implemented by the internal injection context
+/// and provides the interface for registering services.
+abstract class Context {
+  /// This method shall be called to register a service with the injection
+  /// context. It must only be called, after the [startup] has been called.
+  ///
+  /// The [initializer] is called when an instance of the service shall be
+  /// created. It must return the instance of the service. By passing a [name],
+  /// it is possible to register different services that implement the same
+  /// class. If the flag [asSingleton] is true, the [globalInitializer] is only called
+  /// once when resolving the service. The created service instance will be
+  /// cached. If the flag [asSingleton] is false, the [initializer] is called
+  /// every time when resolving the service.
+  ///
+  /// Throws a [InjectionContextNotInitialized] exception, if the injection
+  /// context is not started.
+  ///
+  /// Throws a [InjectionContextHasAlreadyService] exception, if the service
+  /// that shall be registered was already registered before.
+  void register<T>(
+    ServiceInitializer<T> globalInitializer, {
+    String name,
+    bool asSingleton = true,
+  });
+}
+
 /// The [_InjectionContext] is the global registry for all services. It is a
 /// singleton, since the context must be the same instance in the entire
 /// application.
-class _InjectionContext {
+class _InjectionContext implements Context {
   String profile;
 
   /// This flag determines whether the [startup] method has been called or not.
@@ -111,7 +137,7 @@ class _InjectionContext {
 
     _initialized = true;
 
-    initializer();
+    initializer(this);
   }
 
   /// This method can be called to reset the injection context. Every registered
@@ -137,6 +163,7 @@ class _InjectionContext {
   ///
   /// Throws a [InjectionContextHasAlreadyService] exception, if the service
   /// that shall be registered was already registered before.
+  @override
   void register<T>(
     ServiceInitializer<T> globalInitializer, {
     String name,
@@ -229,34 +256,6 @@ void startup(InjectionInitializer initializer,
 /// service and all singleton instances will be removed.
 void shutdown() {
   _ContextCollection.shared.shutdown();
-}
-
-/// This function shall be called to register a service with the injection
-/// context. It must only be called, after the [startup] has been called.
-///
-/// The [initializer] is called when an instance of the service shall be
-/// created. It must return the instance of the service. By passing a [name],
-/// it is possible to register different services that implement the same
-/// class.
-///
-/// If the [profile] is given, the service is registered only for the given
-/// profile.
-///
-/// If the flag [asSingleton] is true, the [initializer] is only called
-/// once when resolving the service. The created service instance will be
-/// cached. If the flag [asSingleton] is false, the [initializer] is called
-/// every time when resolving the service.
-///
-/// Throws a [InjectionContextNotInitialized] exception, if the injection
-/// context is not started.
-///
-/// Throws a [InjectionContextHasAlreadyService] exception, if the service
-/// that shall be registered was already registered before.
-void register<T>(ServiceInitializer<T> initializer, {String name, String profile, bool asSingleton = true}) {
-  var context =
-      profile == null ? _ContextCollection.shared.globalContext : _ContextCollection.shared._getContext(profile);
-
-  context.register(initializer, name: name, asSingleton: asSingleton);
 }
 
 /// This function resolves a service determined by the type [T] and an optional

@@ -24,13 +24,13 @@ void main() {
   //
   group('Check initialization logic', () {
     test('Registering a service without startup is not only possible', () {
-      expect(() => di.register<String>(() => ''), throwsException);
+      expect((context) => context.register<String>(() => ''), throwsException);
     });
 
     test('Starting the injection context more than once is not possible', () {
-      expect(() {
-        di.startup(() {});
-        di.startup(() {});
+      expect((context) {
+        di.startup((context) {});
+        di.startup((context) {});
       }, throwsException);
     });
     test('Resolving without an initialized injection context is failing', () {
@@ -42,25 +42,23 @@ void main() {
   //
   group('Registering and resolving services is successful', () {
     test('Resolving an unknown service is failing', () {
-      di.startup(() {});
+      di.startup((context) {});
 
       expect(() => di.resolve<String>(), throwsException);
     });
-    test('Register a non-singleton service and resolving it, is successful',
-        () {
-      di.startup(() {
-        di.register<String>(() => 'Hello world!', asSingleton: false);
+    test('Register a non-singleton service and resolving it, is successful', () {
+      di.startup((context) {
+        context.register<String>(() => 'Hello world!', asSingleton: false);
       });
 
       var service = di.resolve<String>();
 
       expect(service, equals('Hello world!'));
     });
-    test('Register a non-singleton service creates new instances on resolution',
-        () {
+    test('Register a non-singleton service creates new instances on resolution', () {
       var instNum = 0;
-      di.startup(() {
-        di.register<String>(() {
+      di.startup((context) {
+        context.register<String>(() {
           instNum++;
           return "I'm instance $instNum";
         }, asSingleton: false);
@@ -73,12 +71,10 @@ void main() {
       expect(service2, equals("I'm instance 2"));
       expect(identical(service1, service2), isFalse);
     });
-    test(
-        'Register a singleton service returns the same instances on resolution',
-        () {
+    test('Register a singleton service returns the same instances on resolution', () {
       var instNum = 0;
-      di.startup(() {
-        di.register<String>(() {
+      di.startup((context) {
+        context.register<String>(() {
           instNum++;
           return "I'm instance $instNum";
         }, asSingleton: true);
@@ -91,12 +87,10 @@ void main() {
       expect(service2, equals("I'm instance 1"));
       expect(identical(service1, service2), isTrue);
     });
-    test(
-        'Registering services with same type and different names and resolving them is successful',
-        () {
-      di.startup(() {
-        di.register<String>(() => "I'm a Cat", name: 'Cat', asSingleton: false);
-        di.register<String>(() => "I'm a Dog", name: 'Dog', asSingleton: false);
+    test('Registering services with same type and different names and resolving them is successful', () {
+      di.startup((context) {
+        context.register<String>(() => "I'm a Cat", name: 'Cat', asSingleton: false);
+        context.register<String>(() => "I'm a Dog", name: 'Dog', asSingleton: false);
       });
 
       var cat = di.resolve<String>(name: 'Cat');
@@ -105,22 +99,19 @@ void main() {
       expect(cat, equals("I'm a Cat"));
       expect(dog, equals("I'm a Dog"));
     });
-    test('Registering two services with same type and names is not successful',
-        () {
+    test('Registering two services with same type and names is not successful', () {
       expect(
-          () => di.startup(() {
-                di.register<String>(() => "I'm a Cat",
-                    name: 'Pet', asSingleton: false);
-                di.register<String>(() => "I'm a Dog",
-                    name: 'Pet', asSingleton: false);
+          () => di.startup((context) {
+                context.register<String>(() => "I'm a Cat", name: 'Pet', asSingleton: false);
+                context.register<String>(() => "I'm a Dog", name: 'Pet', asSingleton: false);
               }),
           throwsException);
     });
     test('Resolving all services that implement a class is successful', () {
-      di.startup(() {
-        di.register<String>(() => 'Service 1', name: 'srv1');
-        di.register<String>(() => 'Service 2', name: 'srv2');
-        di.register<String>(() => 'Service 3', name: 'srv3');
+      di.startup((context) {
+        context.register<String>(() => 'Service 1', name: 'srv1');
+        context.register<String>(() => 'Service 2', name: 'srv2');
+        context.register<String>(() => 'Service 3', name: 'srv3');
       });
 
       var services = di.resolveAll<String>();
@@ -134,5 +125,22 @@ void main() {
   //
   // ***** Registering and resolving services for profiles is successful *****
   //
-  group('Registering and resolving services for profiles is successful', () {});
+  group('Registering and resolving services for profiles is successful', () {
+    test('Resolving an unknown service is failing', () {
+      di.startup((context) {}, activeProfiles: ['test'], profileInitializers: {'test': (context) {}});
+
+      expect(() => di.resolve<String>(), throwsException);
+    });
+    test('Register a non-singleton service and resolving it, is successful', () {
+      di.startup((context) {}, activeProfiles: [
+        'test'
+      ], profileInitializers: {
+        'test': (context) => context.register<String>(() => 'Hello world!', asSingleton: false)
+      });
+
+      var service = di.resolve<String>();
+
+      expect(service, equals('Hello world!'));
+    });
+  });
 }
