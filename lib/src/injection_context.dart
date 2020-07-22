@@ -230,6 +230,10 @@ class _InjectionContext implements Context {
   String _key<T>(String name) {
     return _stringOfType<T>() + ':' + (name ?? _stringOfType<T>());
   }
+
+  bool _hasService<T>({String name}) {
+    return _services.containsKey(_key<T>(name));
+  }
 }
 
 /// This function must be called at the very beginning of the application to initialize
@@ -266,9 +270,27 @@ void shutdown() {
 ///
 /// Throws a [InjectionContextHasNoService] exception, if the service
 /// that shall be resolved was not registered before.
-T resolve<T>({String name}) => _ContextCollection.shared.globalContext.resolve<T>(name: name);
+T resolve<T>({String name}) {
+  var services = [];
 
-//=> _InjectionContext().resolve<T>(name: name);
+  services.addAll(_ContextCollection.shared.profiles.values
+      .where((context) => context.profile != _ContextCollection.globalProfile)
+      .where((context) => context._hasService<T>(name: name))
+      .map<T>((context) => context.resolve(name: name))
+      .toList());
+
+  if (_ContextCollection.shared.globalContext._hasService<T>(name: name)) {
+    services.add(_ContextCollection.shared.globalContext.resolve<T>(name: name));
+  }
+
+  if (services.length > 1) {
+    throw InjectionContextHasMoreThanOneService(services);
+  } else if (services.isEmpty) {
+    throw InjectionContextHasNoService(_stringOfType<T>(), (name ?? _stringOfType<T>()));
+  }
+
+  return services.first;
+}
 
 /// This function resolves a service determined by the type [T].
 ///

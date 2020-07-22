@@ -23,12 +23,8 @@ void main() {
   // ***** Check initialization logic *****
   //
   group('Check initialization logic', () {
-    test('Registering a service without startup is not only possible', () {
-      expect((context) => context.register<String>(() => ''), throwsException);
-    });
-
     test('Starting the injection context more than once is not possible', () {
-      expect((context) {
+      expect(() {
         di.startup((context) {});
         di.startup((context) {});
       }, throwsException);
