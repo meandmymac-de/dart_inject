@@ -296,4 +296,10 @@ T resolve<T>({String name}) {
 ///
 /// Throws a [InjectionContextNotInitialized] exception, if the injection
 /// context is not started.
-List<T> resolveAll<T>() => _ContextCollection.shared.globalContext.resolveAll<T>();
+List<T> resolveAll<T>() {
+  var services = List<T>();
+
+  _ContextCollection.shared.profiles.values.forEach((context) => services.addAll(context.resolveAll<T>()));
+
+  return services;
+}

@@ -138,5 +138,21 @@ void main() {
 
       expect(service, equals('Hello world!'));
     });
+    test('Resolving all services that implement a class is successful', () {
+      di.startup((context) => context.register<String>(() => 'Service 1', name: 'srv1'), activeProfiles: [
+        'test1',
+        'test2'
+      ], profileInitializers: {
+        'test1': (context) => context.register<String>(() => 'Service 2', name: 'srv2'),
+        'test2': (context) => context.register<String>(() => 'Service 3', name: 'srv3')
+      });
+
+      var services = di.resolveAll<String>();
+
+      expect(services.length, equals(3));
+      expect(services.contains('Service 1'), isTrue);
+      expect(services.contains('Service 2'), isTrue);
+      expect(services.contains('Service 3'), isTrue);
+    });
   });
 }
