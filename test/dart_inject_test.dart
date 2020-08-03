@@ -154,5 +154,12 @@ void main() {
       expect(services.contains('Service 2'), isTrue);
       expect(services.contains('Service 3'), isTrue);
     });
+    test('Resolving a service from profiles with the same name is failing', () {
+      di.startup((context) => context.register<String>(() => 'Service 1', name: 'srv'),
+          activeProfiles: ['test1'],
+          profileInitializers: {'test1': (context) => context.register<String>(() => 'Service 2', name: 'svr')});
+
+      expect(() => di.resolve<String>(name: 'srv'), throwsException);
+    });
   });
 }

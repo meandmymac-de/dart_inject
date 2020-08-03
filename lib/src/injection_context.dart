@@ -232,7 +232,7 @@ class _InjectionContext implements Context {
   }
 
   bool _hasService<T>({String name}) {
-    return _services.containsKey(_key<T>(name));
+    return _services.keys.where((key) => (key.compareTo(_key<T>(name)) == 0)).isNotEmpty;
   }
 }
 
@@ -273,11 +273,14 @@ void shutdown() {
 T resolve<T>({String name}) {
   var services = [];
 
-  services.addAll(_ContextCollection.shared.profiles.values
-      .where((context) => context.profile != _ContextCollection.globalProfile)
-      .where((context) => context._hasService<T>(name: name))
-      .map<T>((context) => context.resolve(name: name))
-      .toList());
+  services.addAll(_ContextCollection.shared.profiles.values.where((context) {
+    var notGlobalContext = (context.profile != _ContextCollection.globalProfile);
+    var hasService = context._hasService<T>(name: name);
+
+    return notGlobalContext && hasService;
+  }).map<T>((context) {
+    return context.resolve<T>(name: name);
+  }));
 
   if (_ContextCollection.shared.globalContext._hasService<T>(name: name)) {
     services.add(_ContextCollection.shared.globalContext.resolve<T>(name: name));
