@@ -57,6 +57,8 @@ class _ContextCollection {
   /// Getter for the shared instance.
   static _ContextCollection get shared => _ContextCollection._singleton;
 
+  List<_InjectionContext> get _activeContexts => activeProfiles.map((profile) => _getContext(profile));
+
   _InjectionContext get globalContext {
     return _getContext(globalProfile);
   }
@@ -245,6 +247,7 @@ class _InjectionContext implements Context {
 void startup(InjectionInitializer initializer,
     {List<String> activeProfiles, Map<String, InjectionInitializer> profileInitializers}) {
   _ContextCollection.shared.activeProfiles.addAll(activeProfiles ?? []);
+  _ContextCollection.shared.activeProfiles.add(_ContextCollection.globalProfile);
 
   var globalContext = _ContextCollection.shared.globalContext;
   globalContext.startup(initializer);
@@ -273,14 +276,7 @@ void shutdown() {
 T resolve<T>({String name}) {
   var services = [];
 
-  services.addAll(_ContextCollection.shared.profiles.values.where((context) {
-    var notGlobalContext = (context.profile != _ContextCollection.globalProfile);
-    var hasService = context._hasService<T>(name: name);
-
-    return notGlobalContext && hasService;
-  }).map<T>((context) {
-    return context.resolve<T>(name: name);
-  }));
+  services.addAll(_ContextCollection.shared._activeContexts.where((context) => context._hasService(name: name)).map<T>((context) => context.resolve<T>(name: name)));
 
   if (_ContextCollection.shared.globalContext._hasService<T>(name: name)) {
     services.add(_ContextCollection.shared.globalContext.resolve<T>(name: name));
