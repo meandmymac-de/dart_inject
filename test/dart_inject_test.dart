@@ -19,6 +19,7 @@ import 'package:test/test.dart';
 
 void main() {
   tearDown(() => di.shutdown());
+
   //
   // ***** Check initialization logic *****
   //
@@ -154,12 +155,22 @@ void main() {
       expect(services.contains('Service 2'), isTrue);
       expect(services.contains('Service 3'), isTrue);
     });
-    test('Resolving a service from profiles with the same name is failing', () {
+    test('Resolving a service from active profile and global profile with the same name is failing', () {
       di.startup((context) => context.register<String>(() => 'Service 1', name: 'srv'),
           activeProfiles: ['test1'],
-          profileInitializers: {'test1': (context) => context.register<String>(() => 'Service 2', name: 'svr')});
+          profileInitializers: {'test1': (context) => context.register<String>(() => 'Service 2', name: 'srv')});
 
       expect(() => di.resolve<String>(name: 'srv'), throwsException);
+    });
+    test('Resolving a service from active profile with the same name is succeeding', () {
+      di.startup((context) {}, activeProfiles: [
+        'test1'
+      ], profileInitializers: {
+        'test1': (context) => context.register<String>(() => 'Service Test 1', name: 'srv'),
+        'test2': (context) => context.register<String>(() => 'Service Test 2', name: 'srv')
+      });
+
+      expect(di.resolve<String>(name: 'srv'), equals('Service Test 1'));
     });
   });
 }

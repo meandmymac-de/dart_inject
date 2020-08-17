@@ -14,6 +14,8 @@
 // limitations under the License.
 //
 
+import 'dart:collection';
+
 import 'exceptions.dart';
 
 String _stringOfType<T>() => T.toString();
@@ -57,7 +59,8 @@ class _ContextCollection {
   /// Getter for the shared instance.
   static _ContextCollection get shared => _ContextCollection._singleton;
 
-  List<_InjectionContext> get _activeContexts => activeProfiles.map((profile) => _getContext(profile));
+  List<_InjectionContext> get _activeContexts =>
+      activeProfiles.map<_InjectionContext>((profile) => _getContext(profile)).toList();
 
   _InjectionContext get globalContext {
     return _getContext(globalProfile);
@@ -124,7 +127,7 @@ class _InjectionContext implements Context {
   /// functional and each call to any method results in an error.
   bool _initialized = false;
 
-  Map<String, _ServiceConfiguration> _services = {};
+  Map<String, _ServiceConfiguration> _services = HashMap<String, _ServiceConfiguration>();
 
   /// This factory always returns the singleton instance of the
   /// [_InjectionContext].
@@ -146,7 +149,7 @@ class _InjectionContext implements Context {
   /// service and all singleton instances will be removed.
   void shutdown() {
     _initialized = false;
-    _services = {};
+    _services = HashMap<String, _ServiceConfiguration>();
   }
 
   /// This method shall be called to register a service with the injection
@@ -230,11 +233,15 @@ class _InjectionContext implements Context {
   }
 
   String _key<T>(String name) {
-    return _stringOfType<T>() + ':' + (name ?? _stringOfType<T>());
+    var key = '';
+
+    key = key + _stringOfType<T>() + ':' + (name ?? _stringOfType<T>());
+
+    return key;
   }
 
   bool _hasService<T>({String name}) {
-    return _services.keys.where((key) => (key.compareTo(_key<T>(name)) == 0)).isNotEmpty;
+    return _services.containsKey(_key<T>(name));
   }
 }
 
@@ -274,13 +281,10 @@ void shutdown() {
 /// Throws a [InjectionContextHasNoService] exception, if the service
 /// that shall be resolved was not registered before.
 T resolve<T>({String name}) {
-  var services = [];
-
-  services.addAll(_ContextCollection.shared._activeContexts.where((context) => context._hasService(name: name)).map<T>((context) => context.resolve<T>(name: name)));
-
-  if (_ContextCollection.shared.globalContext._hasService<T>(name: name)) {
-    services.add(_ContextCollection.shared.globalContext.resolve<T>(name: name));
-  }
+  var services = _ContextCollection.shared._activeContexts
+      .where((context) => context._hasService<T>(name: name))
+      .map<T>((context) => context.resolve<T>(name: name))
+      .toList();
 
   if (services.length > 1) {
     throw InjectionContextHasMoreThanOneService(services);
