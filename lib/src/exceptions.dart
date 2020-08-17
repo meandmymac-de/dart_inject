@@ -31,3 +31,8 @@ class InjectionContextHasNoService extends StateError implements Exception {
   InjectionContextHasNoService(String service, String name)
       : super('The InjectionContext has no registered service $service:$name');
 }
+
+class InjectionContextHasMoreThanOneService extends StateError implements Exception {
+  InjectionContextHasMoreThanOneService(List services)
+      : super('The InjectionContext has more than one registered service $services');
+}

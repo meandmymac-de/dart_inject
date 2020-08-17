@@ -28,6 +28,7 @@ test:
   stage: test
   script:
     - pub run test
+    - pub run test_coverage --min-coverage=90
   tags:
     - docker
 
